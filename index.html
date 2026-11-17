@@ -21,31 +21,48 @@
 
 <header class="testata">
   <div>
-    <h1>Conti</h1>
+    <h1 id="titoloApp" class="titolo-app"><span class="titolo-giu">Conti</span></h1>
     <p id="oggi" class="oggi"></p>
     <p id="sfondoNome" class="sfondo-nome"></p>
   </div>
-  <button id="apriMenu" class="tasto-icona tasto-vetro" type="button" aria-label="Menù: sfondo, esporta, importa">
-    <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
-  </button>
+  <div class="testata-tasti">
+    <button id="apriCerca" class="tasto-icona tasto-vetro" type="button" aria-label="Cerca fra i movimenti">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M10.5 3a7.5 7.5 0 0 1 5.96 12.05l4.25 4.24-1.42 1.42-4.24-4.25A7.5 7.5 0 1 1 10.5 3Zm0 2a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11Z"/></svg>
+    </button>
+    <button id="apriMenu" class="tasto-icona tasto-vetro" type="button" aria-label="Menù: sfondo, suoni, categorie, microfono, esporta">
+      <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+    </button>
+  </div>
 </header>
 
 <main>
   <section class="carta segna" aria-label="Segna un movimento">
-    <label for="frase" class="etichetta">Cosa hai speso o incassato?</label>
+    <label for="frase" id="etichettaFrase" class="etichetta">Cosa hai speso o incassato?</label>
     <div class="riga-frase">
-      <textarea id="frase" rows="1" enterkeyhint="done" autocomplete="off" autocorrect="off" autocapitalize="sentences"
-        spellcheck="false" placeholder="pizza 12 ieri · provvigione 1800"></textarea>
+      <textarea id="frase" rows="1" enterkeyhint="done" autocomplete="off" autocorrect="on" autocapitalize="sentences"
+        spellcheck="true" placeholder="pizza 12 ieri · provvigione 1800"></textarea>
       <button id="microfono" class="tasto-microfono" type="button" aria-label="Detta a voce">
-        <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2Z"/></svg>
+        <svg class="icona-mic" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2Z"/></svg>
+        <svg class="icona-stop" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2.5"/></svg>
       </button>
     </div>
+    <div id="statoVoce" class="stato-voce" hidden aria-live="polite">
+      <span id="statoVoceTesto"></span>
+      <span id="ondaVoce" class="onda" hidden aria-hidden="true"></span>
+    </div>
+    <!-- le spese che fa più spesso: un tocco e sono già scritte (17/11/2026) -->
+    <div id="scorciatoie" class="scorciatoie" hidden>
+      <span class="scorciatoie-titolo">Le solite</span>
+      <div id="scorciatoieLista" class="scorciatoie-lista"></div>
+    </div>
     <div id="anteprima" class="anteprima" hidden>
-      <div class="chips">
-        <button id="chipTipo" class="chip" type="button"></button>
+      <div id="antSingolo" class="chips">
+        <button id="chipTipo" class="chip scambia" type="button"></button>
+        <button id="chipConto" class="chip chip-conto" type="button"></button>
         <button id="chipCategoria" class="chip" type="button"></button>
         <button id="chipData" class="chip" type="button"></button>
       </div>
+      <div id="antLista" class="ant-lista" hidden></div>
       <div class="anteprima-riga">
         <div class="anteprima-testo">
           <div id="antImporto" class="ant-importo"></div>
@@ -55,8 +72,13 @@
       </div>
       <p id="antAvviso" class="avviso" hidden></p>
     </div>
-    <p id="suggerimento" class="suggerimento">Scrivi o detta, poi Salva. Data, tipo e categoria si correggono toccandoli.</p>
+    <p id="suggerimento" class="suggerimento">Scrivi o detta, poi Salva. Per esempio «caffè 1,20 in contanti», «pizza 12, benzina 50» o «netflix 13,99 ogni mese».</p>
   </section>
+
+  <div id="bannerTrasloco" class="carta banner" hidden>
+    <p>Avevi già l'app su un'altra icona? Porta qui i tuoi movimenti.</p>
+    <button id="incollaTrasloco" class="tasto-primario" type="button">📥 Incolla</button>
+  </div>
 
   <div id="bannerProva" class="carta banner" hidden>
     <p id="bannerProvaTesto"></p>
@@ -71,6 +93,14 @@
     <button id="bannerEsporta" class="tasto-secondario" type="button">Esporta</button>
   </div>
 
+  <!-- la seconda modalità (15/11/2026): tutti i conti insieme, o uno solo -->
+  <nav id="sceltaConto" class="carta scelta-conto" aria-label="Quale conto guardare">
+    <button type="button" data-conto="" aria-pressed="true"><span class="sc-icona">∑</span><span>Tutto</span></button>
+    <button type="button" data-conto="contanti" aria-pressed="false"><span class="sc-icona">💶</span><span>Contanti</span></button>
+    <button type="button" data-conto="digitale" aria-pressed="false"><span class="sc-icona">💳</span><span>Digitale</span></button>
+    <button type="button" data-conto="cripto" aria-pressed="false"><span class="sc-icona">🪙</span><span>Cripto</span></button>
+  </nav>
+
   <section class="carta" aria-label="Riepilogo del periodo">
     <div class="periodo">
       <div class="nav-periodo">
@@ -84,15 +114,29 @@
       </div>
     </div>
     <div class="riepilogo">
-      <p class="hero-etichetta" id="heroEtichetta"></p>
+      <div class="hero-riga">
+        <p class="hero-etichetta" id="heroEtichetta"></p>
+        <button id="occhio" class="tasto-occhio" type="button" aria-pressed="false" aria-label="Mostra il saldo"><svg class="occhio-aperto" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 5C6.5 5 2.7 9.1 1.5 12c1.2 2.9 5 7 10.5 7s9.3-4.1 10.5-7C21.3 9.1 17.5 5 12 5Zm0 11.5a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9Zm0-2.3a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z"/></svg><svg class="occhio-chiuso" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3.3 2.3 2 3.6l3.2 3.2C3.5 8.1 2.2 9.9 1.5 12c1.2 2.9 5 7 10.5 7 2 0 3.8-.5 5.3-1.4l3.1 3.1 1.3-1.3L3.3 2.3Zm8.7 14.2a4.5 4.5 0 0 1-4.1-6.3l1.7 1.7a2.2 2.2 0 0 0 2.7 2.7l1.7 1.7c-.6.1-1.3.2-2 .2Zm0-11.5c-1.4 0-2.7.3-3.9.7l1.9 1.9a4.5 4.5 0 0 1 5.8 5.8l3.2 3.2c1.7-1.3 3-2.9 3.5-4.6C21.3 9.1 17.5 5 12 5Z"/></svg></button>
+      </div>
       <p class="hero" id="heroValore"></p>
       <p class="hero-sotto" id="heroSotto"></p>
       <div class="tessere">
-        <div class="tessera"><span class="t-etichetta">Entrate</span><span class="t-valore" id="totEntrate"></span></div>
-        <div class="tessera"><span class="t-etichetta">Uscite</span><span class="t-valore" id="totUscite"></span></div>
-        <div class="tessera"><span class="t-etichetta">Investiti</span><span class="t-valore" id="totInvestiti"></span></div>
+        <div class="tessera"><span class="t-etichetta">Entrate</span><span class="t-valore entrata" id="totEntrate"></span><span class="t-confronto" id="confEntrate" hidden></span></div>
+        <div class="tessera"><span class="t-etichetta">Uscite</span><span class="t-valore" id="totUscite"></span><span class="t-confronto" id="confUscite" hidden></span></div>
+      </div>
+      <p id="riepSpostamenti" class="riep-spostamenti" hidden></p>
+    </div>
+  </section>
+
+  <section id="sezAutonomia" class="carta sezione" aria-labelledby="titoloAutonomia">
+    <div class="titolo-sez">
+      <h3 id="titoloAutonomia">Mesi di autonomia</h3>
+      <div class="titolo-sez-tasti">
+        <button id="occhioSaldi" class="tasto-occhio" type="button" aria-pressed="false" aria-label="Mostra il saldo" hidden><svg class="occhio-aperto" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 5C6.5 5 2.7 9.1 1.5 12c1.2 2.9 5 7 10.5 7s9.3-4.1 10.5-7C21.3 9.1 17.5 5 12 5Zm0 11.5a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9Zm0-2.3a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z"/></svg><svg class="occhio-chiuso" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3.3 2.3 2 3.6l3.2 3.2C3.5 8.1 2.2 9.9 1.5 12c1.2 2.9 5 7 10.5 7 2 0 3.8-.5 5.3-1.4l3.1 3.1 1.3-1.3L3.3 2.3Zm8.7 14.2a4.5 4.5 0 0 1-4.1-6.3l1.7 1.7a2.2 2.2 0 0 0 2.7 2.7l1.7 1.7c-.6.1-1.3.2-2 .2Zm0-11.5c-1.4 0-2.7.3-3.9.7l1.9 1.9a4.5 4.5 0 0 1 5.8 5.8l3.2 3.2c1.7-1.3 3-2.9 3.5-4.6C21.3 9.1 17.5 5 12 5Z"/></svg></button>
+        <button id="modSaldo" class="tasto-piccolo" type="button" hidden>Correggi saldo</button>
       </div>
     </div>
+    <div id="autonomiaCorpo"></div>
   </section>
 
   <section id="sezCategorie" class="carta sezione" aria-labelledby="titoloCategorie">
@@ -102,6 +146,11 @@
 
   <section id="sezMesi" class="carta sezione" aria-labelledby="titoloMesi" hidden>
     <h3 id="titoloMesi">Mese per mese</h3>
+    <div id="grafico" class="grafico" role="group" aria-label="Uscite mese per mese: tocca un mese per aprirlo">
+      <p class="grafico-titolo" id="graficoTitolo">Uscite</p>
+      <div id="graficoColonne" class="grafico-colonne"></div>
+      <p class="grafico-nota" id="graficoNota"></p>
+    </div>
     <table class="tabella-mesi">
       <thead><tr><th scope="col">Mese</th><th scope="col">Entrate</th><th scope="col">Uscite</th><th scope="col">Saldo</th></tr></thead>
       <tbody id="righeMesi"></tbody>
@@ -110,10 +159,12 @@
 
   <section id="sezMovimenti" class="carta sezione" aria-labelledby="titoloMovimenti">
     <div class="titolo-sez">
-      <h3 id="titoloMovimenti">Movimenti</h3>
+      <h3 id="titoloMovimenti">Ultimi movimenti</h3>
       <button id="filtro" class="chip piccolo" type="button" hidden></button>
     </div>
     <div id="lista"></div>
+    <!-- 18/11/2026: tutti i movimenti, dal… al…, col resoconto (apriMovimenti) -->
+    <button id="tuttiMovimenti" class="azione tutti-movimenti" type="button" hidden>📜 Tutti i movimenti ›<small></small></button>
   </section>
 </main>
 
@@ -126,6 +177,8 @@
 
 <script src="edizione.js"></script>
 <script src="analizza.js"></script>
+<script src="voce.js"></script>
+<script src="suoni.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

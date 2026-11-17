@@ -69,6 +69,16 @@ h1, h2, h3, p { margin: 0; }
   max-width: 640px; margin: 0 auto;
 }
 .testata h1 { font-size: 34px; font-weight: 750; letter-spacing: -0.02em; color: #fff; text-shadow: 0 1px 12px rgba(0, 0, 0, 0.45); line-height: 1.1; }
+/* il nome dell'app: «Che Conti» sopra, «Devastanti» grande e infuocato (10/11/2026) */
+.titolo-app { display: flex; flex-direction: column; }
+.titolo-su { font-size: 21px; font-weight: 700; letter-spacing: 0.01em; color: rgba(255, 255, 255, 0.95); line-height: 1.05; }
+.titolo-giu {
+  font-size: 40px; font-weight: 900; letter-spacing: -0.03em; line-height: 1.02; font-style: italic; padding-right: 6px;
+  background: linear-gradient(100deg, #ffe259 0%, #ffa03a 35%, #ff4d6d 70%, #ff2fb9 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+  text-shadow: none; filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 14px rgba(255, 90, 60, 0.35));
+}
+.titolo-app .titolo-giu:only-child { font-size: 34px; font-style: normal; background: none; color: #fff; -webkit-text-fill-color: #fff; filter: drop-shadow(0 1px 10px rgba(0, 0, 0, 0.45)); }
 .oggi { font-size: 15px; font-weight: 600; color: rgba(255, 255, 255, 0.92); text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5); margin-top: 2px; }
 .sfondo-nome { font-size: 12px; color: rgba(255, 255, 255, 0.75); text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6); margin-top: 2px; }
 
@@ -142,6 +152,9 @@ main { padding: 0 max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-are
 .chip.piccolo { min-height: 32px; font-size: 14px; }
 .chip.piccolo::after { content: "✕"; font-size: 12px; }
 .chip.dubbio { border-style: dashed; border-color: var(--testo-tenue); }
+.chip.scambia::after { content: "⇄"; font-size: 13px; }
+.chip.senza-freccia::after { content: none; }
+.chip[aria-pressed="true"] { border-color: var(--accento); box-shadow: inset 0 0 0 1px var(--accento); font-weight: 600; }
 .chip:active { filter: brightness(0.95); }
 
 .anteprima-riga { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
@@ -182,15 +195,16 @@ main { padding: 0 max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-are
 /* ---------------------------------------------------------------- riepilogo */
 .riepilogo { margin-top: 14px; }
 .hero-etichetta { font-size: 15px; color: var(--testo-2); }
-.hero { font-size: 48px; font-weight: 650; letter-spacing: -0.02em; line-height: 1.1; margin-top: 2px; overflow-wrap: anywhere; }
+.hero { font-size: 44px; font-weight: 650; letter-spacing: -0.02em; line-height: 1.1; margin-top: 2px; overflow-wrap: anywhere; }
 .hero-sotto { font-size: 14px; color: var(--testo-2); margin-top: 4px; }
-.tessere { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
+.tessere { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 14px; }
 .tessera {
   background: var(--tessera); border-radius: 14px; padding: 10px 12px;
   display: flex; flex-direction: column; min-width: 0;
 }
 .t-etichetta { font-size: 13px; color: var(--testo-2); }
-.t-valore { font-size: 17px; font-weight: 650; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.t-valore { font-size: 19px; font-weight: 650; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+.t-valore.entrata { color: var(--positivo); }
 
 .sezione { margin-top: 12px; }
 .sezione h3 { font-size: 17px; font-weight: 650; margin-bottom: 10px; }
@@ -239,14 +253,20 @@ main { padding: 0 max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-are
 .mov-importo.investimento { color: var(--testo-2); }
 
 /* ---------------------------------------------------------------- foglio dal basso */
-.velo { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.35); z-index: 20; }
+.velo { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.35); z-index: 20; transition: opacity 0.22s ease; }
 .foglio {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 21; max-height: 88vh; overflow-y: auto;
   background: var(--superficie); border-radius: 20px 20px 0 0; border-top: 1px solid var(--bordo);
   padding: 8px max(16px, env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
-  max-width: 640px; margin: 0 auto; -webkit-overflow-scrolling: touch;
+  max-width: 640px; margin: 0 auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+  transition: transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-.maniglia { width: 40px; height: 5px; border-radius: 3px; background: var(--filo); margin: 0 auto 12px; }
+/* entra scivolando dal basso; si trascina in giù per chiuderlo */
+.foglio.entra, .foglio.via { transform: translateY(100%) !important; }
+.foglio.via { transition: transform 0.2s ease-in; }
+.foglio.trascina { transition: none; }
+.maniglia { touch-action: none; }
+.maniglia { width: 40px; height: 5px; border-radius: 3px; background: var(--testo-tenue); opacity: 0.45; margin: 0 auto 12px; }
 .foglio h2 { font-size: 20px; font-weight: 650; margin-bottom: 12px; }
 .foglio p { font-size: 15px; color: var(--testo-2); }
 .foglio p + p { margin-top: 8px; }
@@ -254,7 +274,11 @@ main { padding: 0 max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-are
 .opzione {
   min-height: 48px; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--bordo); background: var(--superficie-2);
   text-align: left; font-size: 15px; display: flex; align-items: center; gap: 8px;
+  -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
 }
+.opzione.spenta { opacity: 0.55; }
+.griglia.in-modifica .opzione { border-style: dashed; border-color: var(--accento); }
+.opzione .matita { margin-left: auto; font-size: 12px; color: var(--accento); flex-shrink: 0; }
 .opzione[aria-pressed="true"] { border-color: var(--accento); box-shadow: inset 0 0 0 1px var(--accento); font-weight: 600; }
 .opzione.larga { grid-column: 1 / -1; }
 .campo { display: block; margin-top: 12px; }
@@ -278,10 +302,12 @@ main { padding: 0 max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-are
 .toast {
   position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 30;
   display: flex; align-items: center; gap: 12px; max-width: calc(100% - 32px);
+  width: max-content;   /* con left: 50% si stringeva a metà schermo appena il testo andava a capo */
   background: #262624; color: #f0efec; border-radius: 14px; padding: 10px 10px 10px 16px; font-size: 15px;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
 }
-#toastTesto { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* fino a tre righe: tagliato su una riga, l'avviso «Aggiornata da sola» perdeva la novità (10/11/2026) */
+#toastTesto { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-height: 1.3; }
 .toast button { border: 0; background: transparent; color: #86b6ef; font-weight: 650; min-height: 36px; padding: 0 8px; flex-shrink: 0; }
 
 @media (forced-colors: active) {
@@ -307,3 +333,223 @@ main { padding: 0 max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-are
 .passi { margin: 4px 0 0; padding-left: 22px; }
 .passi li { font-size: 15px; color: var(--testo-2); margin-bottom: 8px; }
 .passi b { color: var(--testo); }
+
+/* microfono: stato, tempo e onda della voce */
+.tasto-microfono .icona-stop { display: none; }
+.tasto-microfono.ascolta .icona-mic { display: none; }
+.tasto-microfono.ascolta .icona-stop { display: block; }
+.tasto-microfono.lavora { background: var(--superficie-2); color: var(--testo-2); }
+.tasto-microfono.lavora svg { animation: gira 1.2s linear infinite; transform-origin: 50% 50%; }
+@keyframes gira { 50% { opacity: 0.35; } }
+.stato-voce { display: flex; align-items: center; gap: 10px; margin-top: 10px; font-size: 14px; color: var(--testo-2); font-variant-numeric: tabular-nums; }
+#statoVoceTesto { flex-shrink: 0; max-width: 70%; }
+.onda { flex: 1; display: flex; align-items: center; gap: 2px; height: 26px; min-width: 60px; }
+.onda > span { flex: 1; height: 100%; border-radius: 2px; background: var(--critico); transform: scaleY(0.08); transform-origin: center; transition: transform 90ms linear; }
+body.in-ascolto .segna { border-color: rgba(230, 103, 103, 0.7); box-shadow: 0 0 0 3px rgba(230, 103, 103, 0.25), 0 8px 30px rgba(0, 0, 0, 0.18); }
+
+/* più movimenti in una frase */
+.ant-lista { display: flex; flex-direction: column; gap: 10px; }
+.ant-voce { padding: 10px 12px; border-radius: 14px; background: var(--tessera); }
+.ant-voce-su { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+.ant-voce-desc { font-size: 16px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.ant-voce-importo { font-size: 17px; font-weight: 650; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ant-voce-importo.manca { color: var(--testo-tenue); font-weight: 500; }
+.chips.piccole { margin-top: 6px; gap: 6px; }
+.chips.piccole .chip { min-height: 30px; padding: 4px 10px; font-size: 13px; }
+
+/* mesi di autonomia */
+.aut-mesi { font-size: 32px; font-weight: 650; letter-spacing: -0.01em; line-height: 1.15; }
+.aut-testo { font-size: 14px; color: var(--testo-2); margin-top: 2px; }
+.aut-righe { margin-top: 10px; }
+.aut-riga { display: flex; justify-content: space-between; gap: 8px; font-size: 15px; padding: 6px 0; border-top: 1px solid var(--filo); font-variant-numeric: tabular-nums; }
+.aut-riga.forte { font-weight: 650; }
+
+/* fogli: righe, interruttori, categorie, emoji */
+.tasto-piccolo { min-height: 34px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--bordo); background: var(--superficie-2); font-size: 14px; font-weight: 600; flex-shrink: 0; }
+.tasto-piccolo.pericolo { color: var(--critico); }
+.riassunto { font-weight: 600; color: var(--testo) !important; margin-top: 8px; }
+.elenco-righe { margin-top: 10px; }
+.interruttore { display: flex; align-items: center; gap: 12px; min-height: 48px; font-size: 16px; border-bottom: 1px solid var(--filo); }
+.interruttore input { width: 24px; height: 24px; accent-color: var(--tasto); flex-shrink: 0; }
+.cat-riga { width: 100%; display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 8px 2px; border: 0; border-bottom: 1px solid var(--filo); background: transparent; text-align: left; border-radius: 0; }
+.cat-riga:active { background: var(--superficie-2); }
+.cat-usi { font-size: 13px; color: var(--testo-tenue); font-variant-numeric: tabular-nums; }
+.cat-freccia { font-size: 22px; color: var(--testo-tenue); line-height: 1; padding: 0 4px; }
+.cat-riga.nascosta .cat-nome, .cat-riga.nascosta .cat-icona { opacity: 0.5; }
+.cat-icona { width: 28px; text-align: center; font-size: 18px; flex-shrink: 0; }
+.cat-nome { flex: 1; min-width: 0; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.griglia-emoji { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; }
+.emoji { min-height: 40px; border-radius: 10px; border: 1px solid var(--bordo); background: var(--superficie-2); font-size: 20px; padding: 0; }
+.emoji[aria-pressed="true"] { border-color: var(--accento); box-shadow: inset 0 0 0 1px var(--accento); }
+.segmentato.largo { display: flex; width: 100%; margin-bottom: 4px; }
+.segmentato.largo button { flex: 1; }
+.opzione.tratteggiata { border-style: dashed; justify-content: center; color: var(--testo-2); }
+
+/* fogli: tasto nell'angolo, note sotto il titolo, date affiancate, conferme */
+.tasto-piccolo.angolo { position: absolute; top: 22px; right: max(16px, env(safe-area-inset-right)); }
+.nota-su { font-size: 13px !important; color: var(--testo-tenue) !important; margin: -4px 0 10px !important; }
+.riga-date { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.riga-date > .campo { min-width: 0; }
+.riga-date .campo input { min-width: 0; max-width: 100%; }
+.riga-tasti.colonna { flex-direction: column; }
+.tasto-pericolo.pieno { background: var(--critico); color: #fff; border-color: var(--critico); }
+.allarme { font-size: 19px !important; font-weight: 700; color: var(--critico) !important; }
+.scelta-modello[aria-pressed="true"] { border-color: var(--accento); box-shadow: inset 0 0 0 1px var(--accento); }
+.foglio .campo input[type=date] { -webkit-appearance: none; appearance: none; }
+.foglio:has(.angolo) h2 { padding-right: 118px; }
+/* mentre ascolta o trascrive, sotto il riquadro solo lo stato della voce */
+body.voce-attiva .suggerimento { display: none; }
+
+/* spese ricorrenti: i giorni del mese da toccare (10/11/2026) */
+.giorni-mese { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 8px; }
+.giorno-mese { min-height: 44px; border-radius: 12px; border: 1px solid var(--bordo, rgba(255,255,255,.14));
+  background: var(--superficie-2, rgba(255,255,255,.06)); color: inherit; font: inherit; font-weight: 600; font-variant-numeric: tabular-nums;
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+.giorno-mese[aria-pressed="true"] { background: var(--accento, #2f6fd6); border-color: var(--accento, #2f6fd6); color: #fff; }
+/* i fissi del mese che devono ancora arrivare */
+.mov.in-arrivo { opacity: .72; }
+.mov.in-arrivo .mov-importo { font-style: italic; }
+.giorno-titolo.in-arrivo { opacity: .8; }
+
+/* trasloco su un'icona nuova: i passi */
+.passi { margin: 12px 0 0; padding-left: 22px; display: grid; gap: 12px; line-height: 1.4; }
+.passi li::marker { font-weight: 700; color: var(--accento); }
+.passi .tasto-primario { display: block; width: 100%; }
+.indirizzo { font-weight: 600; word-break: break-all; -webkit-user-select: all; user-select: all; }
+
+/* i tre conti (15/11/2026): la scelta in cima al riepilogo, il foglio del conto, gli spostamenti */
+.scelta-conto { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 4px; }
+.scelta-conto button {
+  border: 0; background: transparent; border-radius: 14px; min-height: 54px; padding: 4px 2px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  font-size: 13px; font-weight: 600; color: var(--testo-2);
+}
+.scelta-conto .sc-icona { font-size: 20px; line-height: 1.1; }
+.scelta-conto button[aria-pressed="true"] { background: var(--superficie); color: var(--testo); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.16); }
+.scelta-conto button:active { filter: brightness(0.95); }
+.griglia-conti { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.conto-opzione { flex-direction: column; justify-content: center; text-align: center; min-height: 72px; gap: 2px; }
+.conto-opzione .conto-icona { font-size: 24px; line-height: 1.1; }
+.riep-spostamenti { font-size: 14px; color: var(--testo-2); margin-top: 10px; font-variant-numeric: tabular-nums; }
+.mov-importo.spostamento { color: var(--testo-2); }
+.mov-importo.spostamento.entrata { color: var(--positivo); }
+button.aut-riga { width: 100%; background: transparent; border: 0; border-top: 1px solid var(--filo); border-radius: 0; text-align: left; color: inherit; font: inherit; font-size: 15px; }
+button.aut-riga span:last-child { color: var(--accento); }
+button.aut-riga:active { background: var(--superficie-2); }
+.nota-campo { font-size: 13px !important; color: var(--testo-tenue) !important; margin-top: 6px !important; }
+
+/* il saldo dietro l'occhio (15/11/2026) */
+.hero-riga { display: flex; align-items: center; gap: 4px; }
+.titolo-sez-tasti { display: flex; align-items: center; gap: 6px; }
+.tasto-occhio {
+  min-width: 40px; min-height: 36px; border: 0; background: transparent; border-radius: 10px; padding: 0 8px;
+  display: inline-flex; align-items: center; justify-content: center; color: var(--testo-2);
+}
+.tasto-occhio svg { fill: currentColor; }
+.tasto-occhio .occhio-chiuso { display: none; }
+.tasto-occhio.aperto .occhio-aperto { display: none; }
+.tasto-occhio.aperto .occhio-chiuso { display: block; }
+.tasto-occhio:active { background: var(--superficie-2); }
+
+/* l avviso delle prove di novembre: la frase sopra, i tasti sotto (col testo lungo si stringeva in una colonna) */
+#bannerProva p { flex-basis: 100%; }
+
+/* ---------------------------------------------------------------- 17/11/2026: lente, le solite, confronto, grafico, feste */
+.testata-tasti { display: flex; gap: 8px; flex-shrink: 0; }
+/* i tasti sulla foto restano bianchi: .tasto-icona, scritta dopo, li faceva grigio scuro (quasi invisibili in tema chiaro) */
+.tasto-icona.tasto-vetro { color: #fff; }
+
+/* le solite spese: un tocco e sono scritte */
+.scorciatoie { margin-top: 10px; }
+.scorciatoie-titolo { display: block; font-size: 12px; font-weight: 600; color: var(--testo-tenue); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+.scorciatoie-lista { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip.solita { min-height: 36px; max-width: 100%; padding: 4px 12px 4px 8px; gap: 6px; font-size: 14px; background: var(--tessera); }
+.solita-icona { font-size: 16px; }
+.solita-desc { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.solita-importo { font-weight: 650; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--testo-2); }
+.solita-importo.entrata { color: var(--positivo); }
+body.voce-attiva .scorciatoie { display: none; }
+
+/* sotto entrate e uscite: rispetto al mese prima */
+.t-confronto { font-size: 12px; color: var(--testo-2); margin-top: 3px; line-height: 1.25; font-variant-numeric: tabular-nums; }
+.t-confronto .freccia { font-size: 10px; }
+.t-confronto.bene .freccia { color: var(--positivo); }
+.t-confronto.male .freccia { color: var(--critico); }
+
+/* il grafico dell'anno: una colonna per mese, un colore solo, il mese in corso più scuro */
+.grafico { margin: 2px 0 14px; }
+.grafico-titolo { font-size: 13px; color: var(--testo-2); margin-bottom: 6px; }
+.grafico-colonne { display: grid; grid-template-columns: repeat(12, 1fr); gap: 2px; height: 128px; align-items: stretch; }
+.colonna {
+  border: 0; background: transparent; padding: 0; min-width: 0; display: flex; flex-direction: column; align-items: stretch;
+  border-radius: 6px; color: var(--testo-tenue);
+}
+.colonna:active:not(:disabled) { background: var(--superficie-2); }
+.colonna:disabled { cursor: default; opacity: 1; }
+.colonna-pista { flex: 1; display: flex; align-items: flex-end; justify-content: center; border-bottom: 1px solid var(--filo); }
+.colonna-barra { display: block; width: 62%; max-width: 18px; background: var(--barra); border-radius: 4px 4px 0 0; opacity: 0.75; }
+.colonna.corrente .colonna-barra { opacity: 1; }
+.colonna-mese { font-size: 12px; text-align: center; padding-top: 4px; line-height: 1.2; }
+.colonna.corrente .colonna-mese { color: var(--testo); font-weight: 700; }
+.grafico-nota { font-size: 13px; color: var(--testo-2); margin-top: 8px; font-variant-numeric: tabular-nums; }
+@media (forced-colors: active) { .colonna-barra { background: CanvasText; } }
+
+/* «Devastanti» si accende all'apertura e col suono */
+.titolo-giu { transform-origin: 0 60%; }
+.titolo-giu.brilla { animation: brilla 1.3s cubic-bezier(.2, .7, .2, 1) 1; }
+@keyframes brilla {
+  0% { transform: scale(1); filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 14px rgba(255, 90, 60, 0.35)) brightness(1); }
+  18% { transform: scale(1.07) rotate(-1.5deg); filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 26px rgba(255, 150, 40, 0.95)) brightness(1.45); }
+  42% { transform: scale(0.99) rotate(0.3deg); }
+  100% { transform: scale(1); filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 14px rgba(255, 90, 60, 0.35)) brightness(1); }
+}
+
+/* un'entrata: monete che saltano dal tasto Salva */
+.moneta { position: fixed; z-index: 40; font-size: 24px; line-height: 1; pointer-events: none; will-change: transform, opacity; }
+/* la riga appena salvata si accende un attimo */
+.mov.appena { animation: appena 1.6s ease-out 1; }
+@keyframes appena { 0%, 30% { background: color-mix(in srgb, var(--accento) 22%, transparent); } 100% { background: transparent; } }
+
+/* suoni: la scelta segnata */
+.scelta-suono[aria-pressed="true"] { border-color: var(--accento); box-shadow: inset 0 0 0 1px var(--accento); }
+
+/* cerca */
+.cerca-campo { margin-top: 0; }
+.cerca-campo input { -webkit-appearance: none; appearance: none; }
+.risultati { margin-top: 6px; }
+.risultati .giorno-titolo:first-child { margin-top: 6px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .titolo-giu.brilla, .mov.appena { animation: none; }
+}
+
+/* ---------------------------------------------------------------- 18/11/2026: ultimi 10 e tutti i movimenti */
+.tutti-movimenti { width: 100%; margin-top: 12px; }
+#heroValore { cursor: pointer; -webkit-user-select: none; user-select: none; }
+.periodi { margin-top: 10px; gap: 6px; }
+.periodi .chip { min-height: 34px; font-size: 14px; padding: 4px 12px; }
+.conti-mov { margin-top: 12px; }
+.conti-mov button { padding: 0 6px; font-size: 13px; white-space: nowrap; }
+#categoriaMovimenti { margin-top: 10px; }
+.resoconto { margin-top: 14px; padding: 12px; border-radius: 16px; background: var(--superficie-2); }
+.res-titolo { font-size: 14px !important; font-weight: 600; color: var(--testo) !important; }
+.resoconto .tessere { margin-top: 10px; }
+.resoconto .tessera { background: var(--superficie); }
+.res-saldo {
+  width: 100%; display: flex; justify-content: space-between; gap: 8px; margin-top: 8px; padding: 10px 2px 2px;
+  border: 0; border-top: 1px solid var(--filo); background: transparent; font-size: 15px; color: var(--testo-2); text-align: left;
+}
+.res-saldo-valore { font-weight: 650; color: var(--testo); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.res-categorie { list-style: none; margin: 8px 0 0; padding: 0; }
+.res-categorie li { display: flex; justify-content: space-between; gap: 8px; font-size: 14px; padding: 5px 2px; border-top: 1px solid var(--filo); }
+.res-cat-nome { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.res-cat-valore { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--testo-2); }
+.res-cat-altre { color: var(--testo-tenue); font-size: 13px !important; }
+.mese-titolo {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin: 18px 0 2px; padding: 6px 2px;
+  font-size: 15px; font-weight: 700; border-bottom: 2px solid var(--filo); position: sticky; top: -8px; background: var(--superficie); z-index: 1;
+}
+.mese-uscite { font-size: 13px; font-weight: 500; color: var(--testo-2); font-variant-numeric: tabular-nums; }
+.risultati .mese-titolo:first-child { margin-top: 8px; }
+.risultati .giorno-titolo { margin-top: 10px; }
+.altri { width: 100%; margin-top: 12px; }
