@@ -20,7 +20,11 @@
     { id: 'saldo-tesoro', nome: 'Tesoro', sotto: 'Un forziere che si apre' },
     { id: 'nessuno', nome: 'Nessuno', sotto: 'Il saldo si mostra in silenzio' }
   ];
-  const NOMI = SIGLE.concat(SALDO).map(s => s.id).filter(n => n !== 'nessuno').concat(['entrata', 'uscita', 'spostamento', 'elimina']);
+  // 18/11/2026: il saldo di ogni conto ha il suo suono; le feste hanno il loro al posto della sigla (feste.js)
+  const CONTI = { contanti: 'saldo-contanti', digitale: 'saldo-digitale', cripto: 'saldo-cripto' };
+  const FESTE = ['festa-natale', 'festa-capodanno', 'festa-trombetta', 'festa-halloween', 'festa-pasqua'];
+  const NOMI = SIGLE.concat(SALDO).map(s => s.id).filter(n => n !== 'nessuno')
+    .concat(Object.values(CONTI), FESTE, ['entrata', 'uscita', 'spostamento', 'elimina']);
   const suonati = [];   // per le prove: cosa ha suonato (o avrebbe suonato), in ordine
   const muto = () => !!window.__CONTI_MUTO;
   let ctx = null, caricamento = null, sigillo = 0;   // sigillo: fino a quando (secondi del contesto) suona la sigla
@@ -138,6 +142,6 @@
     return togli;
   }
 
-  window.Suoni = { NOMI, SIGLE, SALDO, prepara, sblocca, suona, provaSubito, ferma, alPrimoTocco, suonati: () => suonati.slice(),
+  window.Suoni = { NOMI, SIGLE, SALDO, CONTI, FESTE, prepara, sblocca, suona, provaSubito, ferma, alPrimoTocco, suonati: () => suonati.slice(),
     stato: () => (ctx ? ctx.state : muto() ? 'muto' : 'chiuso'), pronti: () => Object.keys(buffer).length };
 })();
